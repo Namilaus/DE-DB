@@ -150,11 +150,11 @@ def getCitys(url: str, gotError: int) -> list:
 
 
 stadte = getCitys(
-    "https://www.citypopulation.de/de/germany/cities/nordrheinwestfalen/", 0
+    "https://www.citypopulation.de/de/germany/cities/badenwurttemberg/", 0
 )
 
 for stadt in stadte[3:]:
-    saveCitysinDB(stadt["plz"], stadt["name"], 10)
+    saveCitysinDB(stadt["plz"], stadt["name"], 1)
 print("done")
 
 
@@ -193,3 +193,6 @@ def getUrlsOfStreets(url, numberOfchr, urls: list):
     urls.append(url)
     url = url[:-1]
     return getUrls(url, numberOfchr + 1, urls)
+
+
+## TODO: now after adding the cities to the db(DONE) we can get the streets by the city name from db and then scrape the streets from a web (NOT DONE)
