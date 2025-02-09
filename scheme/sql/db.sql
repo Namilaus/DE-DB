@@ -1,0 +1,51 @@
+CREATE DATABASE DE_adressen CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE DE_adressen;
+
+CREATE TABLE Bundesland(
+	BundeslandID TINYINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	name VARCHAR(80) NOT NULL
+);
+
+
+CREATE TABLE Stadt(
+	plz MEDIUMINT PRIMARY KEY NOT NULL,
+	name VARCHAR(80) NOT NULL,
+	BundeslandID TINYINT NOT NULL
+);
+
+CREATE TABLE StadtsTeil(
+	plz MEDIUMINT PRIMARY KEY NOT NULL,
+	name VARCHAR(80) NOT NULL,
+	stadtPlz MEDIUMINT
+);
+
+CREATE TABLE Strasse(
+	strasseID INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+	name VARCHAR(255),
+	plz MEDIUMINT NOT NULL
+);
+
+-- foreign keys
+
+ALTER TABLE Stadt ADD FOREIGN KEY(BundeslandID) REFERENCES Bundesland(BundeslandID);
+ALTER TABLE StadtsTeil ADD FOREIGN KEY(stadtPlz) REFERENCES Stadt(plz);
+ALTER TABLE Strasse ADD FOREIGN KEY(plz) REFERENCES Stadt(plz);
+ALTER TABLE Strasse ADD FOREIGN KEY(plz) REFERENCES StadtsTeil(plz);
+
+-- a trigger for check plz
+DELIMITER //
+CREATE TRIGGER check_plz
+BEFORE INSERT ON Stadt
+FOR EACH ROW
+BEGIN
+	DECLARE neueName VARCHAR(80);
+	DECLARE neuePlz MEDIUMINT;
+	IF NEW.plz = 1 THEN
+		SELECT MAX(plz) + 1 INTO neuePlz FROM Stadt;
+		SET NEW.plz = neuePlz;
+		SET neueName = CONCAT(NEW.name," NACHTRAGEN!");
+		SET NEW.name = neueName;
+	END IF;
+
+END //
+DELIMITER ;
